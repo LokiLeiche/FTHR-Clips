@@ -11,12 +11,15 @@ import os
 from PySide6.QtGui import QColor, QFont, QPalette
 from PySide6.QtWidgets import QApplication, QStyleFactory
 
+from core.theme_manager import ThemeManager, normalize_font_scale
 from ui.style import Colors, Fonts
 
 
 def configure_qt_for_linux_ui() -> None:
     """Disable host desktop theming before QApplication snapshots it."""
     os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
+    scale = normalize_font_scale(ThemeManager().get_font_scale())
+    os.environ['QT_SCALE_FACTOR'] = f'{scale:g}'
     QApplication.setDesktopSettingsAware(False)
 
 

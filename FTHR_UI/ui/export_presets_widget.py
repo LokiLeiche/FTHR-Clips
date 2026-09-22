@@ -82,7 +82,7 @@ class _PresetStepperMixin:
                 border-radius: 0px;
                 color: {Colors.ACCENT};
                 font-family: {Fonts.DISPLAY};
-                font-size: 14px;
+                font-size: {Fonts.SIZE_BUTTON}px;
                 font-weight: bold;
                 padding: 0px;
             }}

@@ -6,6 +6,8 @@ updates the main theme in one QSS pass.
 from __future__ import annotations
 
 from pathlib import Path
+import math
+import os
 from typing import Optional
 
 from PySide6.QtCore import (
@@ -18,7 +20,7 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea,
     QFrame, QColorDialog, QFileDialog, QSizePolicy, QGridLayout,
-    QSlider,
+    QSlider, QLineEdit
 )
 from ui.style import (
     Colors, Fonts, label_uppercase, label_body,
@@ -29,7 +31,7 @@ from core.theme_manager import (
     ThemeManager, DEFAULT_COLORS, CUSTOMIZABLE_ICONS,
     CUSTOMIZABLE_SOUNDS, SUPPORTED_IMAGE_FORMATS, SUPPORTED_SOUND_FORMATS,
     SUPPORTED_FONT_FORMATS, DEFAULT_CAPTURE_CARD_COLORS, DEFAULT_FONTS,
-    CUSTOMIZABLE_COLOR_GROUPS,
+    CUSTOMIZABLE_COLOR_GROUPS, normalize_font_scale,
 )
 from ui.sound_playback import SoundPlayback
 
@@ -203,7 +205,7 @@ def _inject_custom_titlebar(dlg, title: str):
     close_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
     close_btn.setStyleSheet(
         f'QPushButton {{ background: transparent; border: none;'
-        f' color: {Colors.TEXT_DIM}; font-size: 16px; font-weight: bold; }}'
+        f' color: {Colors.TEXT_DIM}; font-size: {Fonts.SIZE_H3}px; font-weight: bold; }}'
         f' QPushButton:hover {{ background-color: {Colors.ERROR};'
         f' color: {Colors.TEXT}; }}'
     )
@@ -274,7 +276,7 @@ def _fthr_message_box(parent, title: str, message: str,
     close_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
     close_btn.setStyleSheet(
         f'QPushButton {{ background: transparent; border: none;'
-        f' color: {Colors.TEXT_DIM}; font-size: 16px; font-weight: bold; }}'
+        f' color: {Colors.TEXT_DIM}; font-size: {Fonts.SIZE_H3}px; font-weight: bold; }}'
         f' QPushButton:hover {{ background-color: {Colors.ERROR};'
         f' color: {Colors.TEXT}; }}'
     )
@@ -607,7 +609,7 @@ class _ColorPreviewMockup(QFrame):
         tb_layout.setContentsMargins(10, 0, 10, 0)
         logo_lbl = QLabel('FTHR')
         logo_lbl.setStyleSheet(
-            f'color: {c["TEXT"]}; font-size: 10px; font-weight: bold;'
+            f'color: {c["TEXT"]}; font-size: {Fonts.SIZE_LABEL}px; font-weight: bold;'
             f' font-family: {Fonts.DISPLAY}; letter-spacing: 2px;'
             f' background: transparent;'
         )
@@ -705,13 +707,13 @@ class _ColorPreviewMockup(QFrame):
         text_row = QVBoxLayout()
         text_row.setSpacing(2)
         t1 = QLabel('Primary text sample')
-        t1.setStyleSheet(f'color: {c["TEXT"]}; font-size: 9px; background: transparent;')
+        t1.setStyleSheet(f'color: {c["TEXT"]}; font-size: {Fonts.SIZE_MICRO}px; background: transparent;')
         t2 = QLabel('Secondary text sample')
-        t2.setStyleSheet(f'color: {c["TEXT_DIM"]}; font-size: 9px; background: transparent;')
+        t2.setStyleSheet(f'color: {c["TEXT_DIM"]}; font-size: {Fonts.SIZE_MICRO}px; background: transparent;')
         t3 = QLabel('Muted text sample')
-        t3.setStyleSheet(f'color: {c["TEXT_MUTED"]}; font-size: 9px; background: transparent;')
+        t3.setStyleSheet(f'color: {c["TEXT_MUTED"]}; font-size: {Fonts.SIZE_MICRO}px; background: transparent;')
         t4 = QLabel('Ghost text sample')
-        t4.setStyleSheet(f'color: {c["TEXT_GHOST"]}; font-size: 9px; background: transparent;')
+        t4.setStyleSheet(f'color: {c["TEXT_GHOST"]}; font-size: {Fonts.SIZE_MICRO}px; background: transparent;')
         text_row.addWidget(t1)
         text_row.addWidget(t2)
         text_row.addWidget(t3)
@@ -1611,12 +1613,22 @@ class CustomizePage(QWidget):
 
         action_bar.addStretch()
 
+        self._apply_warning = QLabel('FONT SCALE CHANGES WILL RESTART FTHR')
+        self._apply_warning.setStyleSheet(
+            f'color: {Colors.ERROR}; font-size: {Fonts.SIZE_MICRO}px;'
+            f' font-family: {Fonts.DISPLAY}; font-weight: bold;')
+        self._apply_warning.setFixedWidth(220)
+        self._apply_warning.setAlignment(Qt.AlignmentFlag.AlignRight |
+                                         Qt.AlignmentFlag.AlignVCenter)
+        action_bar.addWidget(self._apply_warning)
+
         apply_btn = QPushButton('APPLY THEME')
         apply_btn.setStyleSheet(button_primary_qss())
         apply_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         apply_btn.clicked.connect(self._on_apply)
         self._apply_btn = apply_btn
         action_bar.addWidget(apply_btn)
+        self._update_font_scale_restart_state()
 
         self._layout.addLayout(action_bar)
         self._layout.addStretch()
@@ -1679,6 +1691,32 @@ class CustomizePage(QWidget):
             row.addWidget(import_btn)
             layout.addLayout(row)
 
+        scale_row = QHBoxLayout()
+        scale_row.setSpacing(12)
+        scale_label = QLabel('FONT SCALE')
+        scale_label.setFixedWidth(140)
+        scale_label.setStyleSheet(label_uppercase(Colors.TEXT, Fonts.SIZE_LABEL, 1))
+        scale_row.addWidget(scale_label)
+        self._font_scale_input = QLineEdit()
+        self._font_scale_input.setFixedWidth(100)
+        self._font_scale_input.setText(self._font_scale_text())
+        self._font_scale_input.setStyleSheet(
+            f'background-color: {Colors.SURFACE_2};'
+            f' border: 1px solid {Colors.BORDER}; color: {Colors.TEXT};'
+            f' padding: 6px 10px; font-size: {Fonts.SIZE_BODY}px;'
+            f' font-family: {Fonts.BODY};')
+        self._font_scale_input.textChanged.connect(
+            self._on_font_scale_text_changed)
+        self._font_scale_input.editingFinished.connect(self._on_font_scale_changed)
+        scale_row.addWidget(self._font_scale_input)
+        self._font_scale_restart_hint = QLabel('RESTART REQUIRED')
+        self._font_scale_restart_hint.setStyleSheet(
+            f'color: {Colors.ERROR}; font-size: {Fonts.SIZE_MICRO}px;'
+            f' font-family: {Fonts.DISPLAY}; font-weight: bold;')
+        scale_row.addWidget(self._font_scale_restart_hint)
+        scale_row.addStretch()
+        layout.addLayout(scale_row)
+
         self._font_preview = QLabel(
             "YOUR PRIVACY ISN'T CURRENCY  ·  Your privacy isn't currency.")
         self._font_preview.setMinimumHeight(52)
@@ -1697,7 +1735,42 @@ class CustomizePage(QWidget):
         layout.addLayout(reset_row)
 
         self._update_font_preview()
+        self._update_font_scale_restart_state()
         self._typography_section.add_content(wrapper)
+
+
+    def _font_scale_text(self) -> str:
+        scale = self._theme.get_font_scale()
+        return f'{scale:g}'
+
+    def _on_font_scale_changed(self):
+        self._theme.set_font_scale(self._font_scale_input.text())
+        self._theme.save()
+        self._font_scale_input.setText(self._font_scale_text())
+        self._update_font_preview()
+        self._update_font_scale_restart_state()
+
+    def _active_font_scale(self) -> float:
+        return normalize_font_scale(os.environ.get('QT_SCALE_FACTOR', 1.0))
+
+    def _set_font_scale_restart_state(self, required: bool):
+        self._font_scale_restart_hint.setVisible(required)
+        if hasattr(self, '_apply_warning'):
+            self._apply_warning.setVisible(required)
+
+    def _on_font_scale_text_changed(self, text: str):
+        required = not math.isclose(
+            normalize_font_scale(text), self._active_font_scale())
+        self._set_font_scale_restart_state(required)
+
+    def font_scale_restart_required(self) -> bool:
+        return not math.isclose(
+            normalize_font_scale(self._theme.get_font_scale()),
+            self._active_font_scale(),
+        )
+
+    def _update_font_scale_restart_state(self):
+        self._set_font_scale_restart_state(self.font_scale_restart_required())
 
     def _on_font_changed(self, role: str):
         combo = self._font_combos.get(role)
@@ -1745,6 +1818,8 @@ class CustomizePage(QWidget):
     def _on_reset_fonts(self):
         self._theme.reset_fonts()
         self._theme.save()
+        self._font_scale_input.setText(self._font_scale_text())
+        self._update_font_scale_restart_state()
         for role, family in DEFAULT_FONTS.items():
             combo = self._font_combos.get(role)
             if combo is None:
@@ -2137,6 +2212,7 @@ class CustomizePage(QWidget):
         self._scroll.verticalScrollBar().setValue(scroll_value)
 
     def _on_apply(self):
+        self._theme.save()
         self.theme_applied.emit()
 
     def _refresh_all(self):
@@ -2164,7 +2240,9 @@ class CustomizePage(QWidget):
                 combo.setCurrentIndex(index)
                 combo.blockSignals(False)
                 combo.setStyleSheet(combo_qss(background=Colors.SURFACE_3))
+            self._font_scale_input.setText(self._font_scale_text())
             self._update_font_preview()
+            self._update_font_scale_restart_state()
         for swatch in self._swatches:
             swatch.set_color(colors.get(swatch.token, '#000000'))
         self._preview.update_colors(colors)

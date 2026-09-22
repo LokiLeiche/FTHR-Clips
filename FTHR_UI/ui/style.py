@@ -81,6 +81,7 @@ class Fonts:
     SIZE_H3     = 16
     SIZE_H2     = 22
     SIZE_H1     = 32
+    SIZE_BUTTON = 14
 
     # Tracking presets (px)
     TRACK_LABEL   = 2

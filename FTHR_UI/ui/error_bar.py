@@ -58,7 +58,7 @@ class ErrorBar(QFrame):
         self._dismiss_btn.setFixedWidth(28)
         self._dismiss_btn.setStyleSheet(
             'QPushButton { background: transparent; border: none;'
-            f' color: {Colors.TEXT_DIM}; font-size: 14px; }}'
+            f' color: {Colors.TEXT_DIM}; font-size: {Fonts.SIZE_BUTTON}px; }}'
             f'QPushButton:hover {{ color: {Colors.TEXT}; }}'
         )
         self._dismiss_btn.clicked.connect(self.dismiss_current)
@@ -76,7 +76,7 @@ class ErrorBar(QFrame):
             f' letter-spacing: 1px; background: transparent; color: {Colors.TEXT_DIM};')
         self._dismiss_btn.setStyleSheet(
             'QPushButton { background: transparent; border: none;'
-            f' color: {Colors.TEXT_DIM}; font-size: 14px; }}'
+            f' color: {Colors.TEXT_DIM}; font-size: {Fonts.SIZE_BUTTON}px; }}'
             f'QPushButton:hover {{ color: {Colors.TEXT}; }}')
         if self._current is not None:
             self._show(self._current)

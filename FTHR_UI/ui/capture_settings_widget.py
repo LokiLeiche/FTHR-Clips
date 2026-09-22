@@ -172,7 +172,7 @@ def _combo_style() -> str:
         border-radius: 0px;
         padding: 3px 8px;
         color: {Colors.TEXT};
-        font-size: 11px;
+        font-size: {Fonts.SIZE_BODY}px;
         font-family: {Fonts.BODY};
         min-width: 90px;
         max-height: 24px;
@@ -195,7 +195,7 @@ def _combo_style() -> str:
         background-color: {Colors.SURFACE_2};
         border: 1px solid {Colors.BORDER_HI};
         color: {Colors.TEXT};
-        font-size: 11px;
+        font-size: {Fonts.SIZE_BODY}px;
         selection-background-color: {Colors.SURFACE_3};
         selection-color: {Colors.ACCENT};
         padding: 2px;
@@ -209,7 +209,7 @@ def _combo_style() -> str:
 def _label_style() -> str:
     return f'''
     color: {Colors.TEXT_DIM};
-    font-size: 10px;
+    font-size: {Fonts.SIZE_LABEL}px;
     font-family: {Fonts.DISPLAY};
     letter-spacing: 1px;
 '''
@@ -220,7 +220,7 @@ def _restart_style() -> str:
         background-color: {Colors.ACCENT};
         border: none;
         color: {Colors.BG};
-        font-size: 10px;
+        font-size: {Fonts.SIZE_LABEL}px;
         font-family: {Fonts.DISPLAY};
         font-weight: bold;
         letter-spacing: 1px;
@@ -286,7 +286,7 @@ class SettingBlock(QWidget):
 
         self._label_widget = QLabel(self._label)
         self._label_widget.setStyleSheet(
-            f'color: {Colors.TEXT_DIM}; font-size: 9px; font-family: {Fonts.DISPLAY};'
+            f'color: {Colors.TEXT_DIM}; font-size: {Fonts.SIZE_MICRO}px; font-family: {Fonts.DISPLAY};'
             'letter-spacing: 1px; font-weight: bold; background: transparent; border: none;'
         )
         top_row.addWidget(self._label_widget)
@@ -297,7 +297,7 @@ class SettingBlock(QWidget):
 
         self._value_widget = QLabel(self._current)
         self._value_widget.setStyleSheet(
-            f'color: {Colors.TEXT}; font-size: 14px; font-family: {Fonts.DISPLAY};'
+            f'color: {Colors.TEXT}; font-size: {Fonts.SIZE_BUTTON}px; font-family: {Fonts.DISPLAY};'
             'font-weight: bold; background: transparent; border: none;'
         )
 
@@ -358,11 +358,11 @@ class SettingBlock(QWidget):
         """Reapply all local styles after the shared theme changes."""
         self._header.setStyleSheet(self._header_style(self._expanded))
         self._label_widget.setStyleSheet(
-            f'color: {Colors.TEXT_DIM}; font-size: 9px; font-family: {Fonts.DISPLAY};'
+            f'color: {Colors.TEXT_DIM}; font-size: {Fonts.SIZE_MICRO}px; font-family: {Fonts.DISPLAY};'
             'letter-spacing: 1px; font-weight: bold; background: transparent; border: none;')
         self._arrow.refresh_theme()
         self._value_widget.setStyleSheet(
-            f'color: {Colors.TEXT}; font-size: 14px; font-family: {Fonts.DISPLAY};'
+            f'color: {Colors.TEXT}; font-size: {Fonts.SIZE_BUTTON}px; font-family: {Fonts.DISPLAY};'
             'font-weight: bold; background: transparent; border: none;')
         self._options_frame.setStyleSheet(
             f'QFrame#settingOptions {{ background-color: {Colors.SURFACE_1};'
@@ -543,7 +543,7 @@ class CaptureSettingsWidget(QWidget):
                 border-radius: 0px;
                 padding: 3px 10px;
                 color: {Colors.TEXT_DIM};
-                font-size: 10px;
+                font-size: {Fonts.SIZE_LABEL}px;
                 font-family: {Fonts.DISPLAY};
                 font-weight: bold;
                 letter-spacing: 1px;
@@ -585,13 +585,13 @@ class CaptureSettingsWidget(QWidget):
         # Warning icon + message
         warning_label = QLabel('⚠')
         warning_label.setStyleSheet(
-            f'color: {Colors.TEXT}; font-size: 14px;')
+            f'color: {Colors.TEXT}; font-size: {Fonts.SIZE_BUTTON}px;')
         hw_status_layout.addWidget(warning_label)
 
         self.hw_status_message = QLabel('Hardware encoding initialization failed - using software encoder (slower)')
         self.hw_status_message.setStyleSheet(f'''
             color: {Colors.TEXT};
-            font-size: 11px;
+            font-size: {Fonts.SIZE_BODY}px;
             font-family: {Fonts.BODY};
             font-weight: bold;
         ''')
@@ -606,7 +606,7 @@ class CaptureSettingsWidget(QWidget):
                 background-color: {Colors.TEXT};
                 border: none;
                 color: {Colors.ERROR};
-                font-size: 10px;
+                font-size: {Fonts.SIZE_LABEL}px;
                 font-family: {Fonts.DISPLAY};
                 font-weight: bold;
                 letter-spacing: 1px;
@@ -775,7 +775,7 @@ class CaptureSettingsWidget(QWidget):
                     border-radius: 0px;
                     padding: 3px 10px;
                     color: {Colors.TEXT_DIM};
-                    font-size: 10px;
+                    font-size: {Fonts.SIZE_LABEL}px;
                     font-family: {Fonts.DISPLAY};
                     font-weight: bold;
                     letter-spacing: 1px;
@@ -789,14 +789,14 @@ class CaptureSettingsWidget(QWidget):
             self._apply_hw_status_style(self._hardware_status_success)
         if hasattr(self, 'hw_status_message'):
             self.hw_status_message.setStyleSheet(f'''
-                color: {Colors.TEXT}; font-size: 11px;
+                color: {Colors.TEXT}; font-size: {Fonts.BODY}px;
                 font-family: {Fonts.BODY}; font-weight: bold;
             ''')
         if hasattr(self, 'retry_button'):
             self.retry_button.setStyleSheet(f'''
                 QPushButton {{
                     background-color: {Colors.TEXT}; border: none;
-                    color: {Colors.ERROR}; font-size: 10px;
+                    color: {Colors.ERROR}; font-size: {Fonts.SIZE_LABEL}px;
                     font-family: {Fonts.DISPLAY}; font-weight: bold;
                     letter-spacing: 1px; padding: 4px 16px; border-radius: 0px;
                 }}

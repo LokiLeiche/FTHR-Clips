@@ -6,6 +6,7 @@ restyling the widget tree on every color-picker change.
 from __future__ import annotations
 
 import json
+import math
 import shutil
 import zipfile
 from pathlib import Path
@@ -41,6 +42,15 @@ DEFAULT_COLORS: dict[str, str] = {
     'SUCCESS':      '#00aa00',
     'DELETE':       '#cc0000',
 }
+
+
+def normalize_font_scale(value) -> float:
+    try:
+        scale = float(value)
+    except (TypeError, ValueError):
+        # User-edited theme values are untrusted; invalid input uses safe UI scale.
+        return 1.0
+    return scale if math.isfinite(scale) and scale > 0 else 1.0
 
 # Every semantic color consumed by the application is exposed here and in the
 # Customize page. Keeping this inventory beside the persisted defaults makes
@@ -203,6 +213,8 @@ class ThemeManager:
                                           **loaded['capture_card']}
             if 'fonts' in loaded:
                 merged['fonts'] = {**DEFAULT_FONTS, **loaded['fonts']}
+            if 'font_scale' in loaded:
+                merged['font_scale'] = loaded['font_scale']
             if 'font_files' in loaded:
                 merged['font_files'] = loaded['font_files']
 
@@ -368,6 +380,14 @@ class ThemeManager:
 
     def reset_fonts(self) -> None:
         self._data['fonts'] = dict(DEFAULT_FONTS)
+        self._data.pop('font_scale', None)
+
+    def get_font_scale(self) -> float:
+        """Return the saved scale, or *1.0* when no valid value exists."""
+        return normalize_font_scale(self._data.get('font_scale', 1.0))
+
+    def set_font_scale(self, value) -> None:
+        self._data['font_scale'] = normalize_font_scale(value)
 
     def set_custom_font(self, families: list[str], source_path: Path) -> Path:
         """Copy one user font into the theme and register its family names."""
@@ -488,6 +508,8 @@ class ThemeManager:
                     'fonts': {**DEFAULT_FONTS, **config_data.get('fonts', {})},
                     'font_files': config_data.get('font_files', {}),
                 }
+                if 'font_scale' in config_data:
+                    self._data['font_scale'] = config_data['font_scale']
                 imported = set(self._data['font_files'])
                 for role in DEFAULT_FONTS:
                     family = str(self._data['fonts'].get(role, 'Oswald'))
@@ -525,5 +547,7 @@ class ThemeManager:
         if self._data.get('capture_card', {}) != DEFAULT_CAPTURE_CARD_COLORS:
             return True
         if self._data.get('fonts', {}) != DEFAULT_FONTS:
+            return True
+        if self.get_font_scale() != 1.0:
             return True
         return False

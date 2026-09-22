@@ -190,7 +190,7 @@ from core.presets_manager import PresetsManager, PRESET_KEYS
 from core.settings_manager import (
     SettingsManager, clips_directory_from, recording_directory_from,
 )
-from core.theme_manager import ThemeManager
+from core.theme_manager import ThemeManager, normalize_font_scale
 from core.windows_monitor import (
     default_windows_monitor_path,
     enumerate_windows_monitors,
@@ -813,7 +813,7 @@ class _NumberSpinBox(QSpinBox):
                 border-radius: 0px;
                 color: {Colors.ACCENT};
                 font-family: {Fonts.DISPLAY};
-                font-size: 14px;
+                font-size: {Fonts.SIZE_BUTTON}px;
                 font-weight: bold;
                 padding: 0px;
             }}
@@ -1809,7 +1809,7 @@ class SourcePopup(_PopupPanel):
                 background-color: {Colors.BG};
                 border: {Sizes.BORDER_W}px solid {Colors.TEXT};
                 color: {Colors.TEXT};
-                font-size: 14px;
+                font-size: {Fonts.SIZE_BUTTON}px;
             }}
             QPushButton:hover {{
                 border-color: {Colors.ACCENT};
@@ -1918,7 +1918,7 @@ class SourcePopup(_PopupPanel):
             QPushButton {{
                 background-color: {Colors.SURFACE_2};
                 border: {Sizes.BORDER_W}px solid {Colors.BORDER};
-                color: {Colors.TEXT}; font-size: 14px;
+                color: {Colors.TEXT}; font-size: {Fonts.SIZE_BUTTON}px;
             }}
             QPushButton:hover {{
                 border-color: {Colors.ACCENT}; color: {Colors.ACCENT};
@@ -8208,7 +8208,7 @@ class MainWindow(QMainWindow):
                 background-color: transparent;
                 border: none;
                 color: {Colors.TEXT_DIM};
-                font-size: 14px;
+                font-size: {Fonts.SIZE_BUTTON}px;
                 font-weight: bold;
             }}
             QPushButton#winBtn:hover {{
@@ -8228,7 +8228,7 @@ class MainWindow(QMainWindow):
                 background-color: transparent;
                 border: none;
                 color: {Colors.TEXT_DIM};
-                font-size: 12px;
+                font-size: {Fonts.SIZE_BUTTON}px;
                 font-weight: bold;
             }}
             QPushButton#closeBtn:hover {{
@@ -8740,6 +8740,8 @@ class _SettingsPage(QWidget):
                  keyboard_capture: ThirdPartyKeyboardCapture | None = None):
         super().__init__(parent)
         self.sm = settings_manager
+        self._startup_font_scale = normalize_font_scale(
+            ThemeManager().get_font_scale())
         self._keyboard_capture = keyboard_capture
         self._keyboard_windows: list[dict] = []
         self._background_ui_paused = False
@@ -8844,7 +8846,9 @@ class _SettingsPage(QWidget):
         self.stack.addWidget(self._make_audio_page())       # 2: Audio
         self.stack.addWidget(self._make_visuals_page())     # 3: Visuals
         self._customize_page = CustomizePage(self.sm)
-        self._customize_page.theme_applied.connect(self._on_theme_applied)
+        self._customize_page.theme_applied.connect(
+            lambda: self._on_theme_applied(
+                restart=self._font_scale_changed_since_startup()))
         self.stack.addWidget(self._customize_page)          # 4: Customize
         self.stack.addWidget(self._make_performance_page()) # 5: Performance
         content_layout.addWidget(self.stack, stretch=1)
@@ -9140,7 +9144,7 @@ class _SettingsPage(QWidget):
         remove_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         set_theme_style(remove_btn, lambda: (f'QPushButton {{ background: transparent;'
             f' border: 1px solid {Colors.BORDER}; color: {Colors.TEXT_DIM};'
-            f' font-size: 14px; font-weight: bold; }}'
+            f' font-size: {Fonts.SIZE_BUTTON}px; font-weight: bold; }}'
             f' QPushButton:hover {{ border-color: {Colors.ERROR}; color: {Colors.ERROR}; }}'))
         remove_btn.clicked.connect(lambda _, p=path: self._remove_import_folder(p))
         rl.addWidget(remove_btn)
@@ -11530,7 +11534,7 @@ class _SettingsPage(QWidget):
         wl.addWidget(scroll)
         return wrapper
 
-    def _on_theme_applied(self):
+    def _on_theme_applied(self, restart: bool = False):
         """Re-apply the full app stylesheet using current theme colors."""
         global _COMBO_STYLE, _LABEL_STYLE
         theme = ThemeManager()
@@ -11569,6 +11573,26 @@ class _SettingsPage(QWidget):
         top = self.window()
         if hasattr(top, '_apply_theme'):
             top._apply_theme()
+        if restart:
+            QTimer.singleShot(0, self._restart_application)
+
+    def _font_scale_changed_since_startup(self) -> bool:
+        scale = normalize_font_scale(ThemeManager().get_font_scale())
+        return not math.isclose(scale, self._startup_font_scale)
+
+    def _restart_application(self):
+        """Restart the UI so Qt can apply the saved scale before startup"""
+        theme = ThemeManager()
+        scale = normalize_font_scale(theme.get_font_scale())
+        environment = os.environ.copy()
+        environment['QT_SCALE_FACTOR'] = f'{scale:g}'
+        if getattr(sys, 'frozen', False):
+            command = [sys.executable, *sys.argv[1:]]
+        else:
+            command = [sys.executable, *sys.argv]
+        self._restart_command = command
+        self._restart_environment = environment
+        QApplication.quit()
 
     def _make_performance_page(self):
         page = QWidget()
@@ -11886,7 +11910,7 @@ class _SettingsPage(QWidget):
                 border: {Sizes.BORDER_W}px solid {Colors.BORDER};
                 border-radius: {Sizes.RADIUS_MD}px;
                 color: {Colors.TEXT};
-                font-size: 14px;
+                font-size: {Fonts.SIZE_BUTTON}px;
                 font-weight: bold;
             }}
             QPushButton#micRefreshBtn:hover {{

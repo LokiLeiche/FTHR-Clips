@@ -1996,16 +1996,16 @@ class StretchDialog(QDialog):
         self.setStyleSheet(f'''
             QDialog {{ background-color: {Colors.SHELL_BG}; }}
             QLabel#stretchDialogTitle {{
-                color: {Colors.TEXT}; font-family: {Fonts.DISPLAY}; font-size: 13px;
+                color: {Colors.TEXT}; font-family: {Fonts.DISPLAY}; font-size: {Fonts.SIZE_BODY_L}px;
                 font-weight: bold; letter-spacing: 2px; background: transparent;
             }}
             QLabel#stretchDialogDimensions {{
-                color: {Colors.ACCENT}; font-family: {Fonts.BODY}; font-size: 11px;
+                color: {Colors.ACCENT}; font-family: {Fonts.BODY}; font-size: {Fonts.SIZE_BODY}px;
                 background: transparent;
             }}
             QPushButton#stretchDialogSecondary, QPushButton#stretchDialogApply {{
                 min-height: 34px; padding: 0 16px; border-radius: 0px;
-                font-family: {Fonts.DISPLAY}; font-size: 10px; font-weight: bold;
+                font-family: {Fonts.DISPLAY}; font-size: {Fonts.SIZE_LABEL}px; font-weight: bold;
                 letter-spacing: 1px;
             }}
             QPushButton#stretchDialogSecondary {{
@@ -2152,7 +2152,7 @@ class CropDialog(QDialog):
         hdr.setContentsMargins(20, 0, 12, 0)
         title = QLabel('CROP')
         title.setStyleSheet(
-            f'color: {Colors.TEXT}; font-size: 9px; font-weight: bold; '
+            f'color: {Colors.TEXT}; font-size: {Fonts.SIZE_MICRO}px; font-weight: bold; '
             f'font-family: {Fonts.DISPLAY}; letter-spacing: 2px; '
             'background: transparent;')
         hdr.addWidget(title)
@@ -2161,7 +2161,7 @@ class CropDialog(QDialog):
         close_btn.setFixedSize(40, 40)
         close_btn.setStyleSheet(
             f'QPushButton {{ background: transparent; border: none;'
-            f' color: {Colors.TEXT}; font-size: 13px; }}'
+            f' color: {Colors.TEXT}; font-size: {Fonts.SIZE_BODY_L}px; }}'
             f'QPushButton:hover {{ color: {Colors.ERROR}; }}')
         close_btn.clicked.connect(self.reject)
         hdr.addWidget(close_btn)
@@ -2199,7 +2199,7 @@ class CropDialog(QDialog):
 
         self.info_lbl = QLabel('')
         self.info_lbl.setStyleSheet(
-            f'color: {Colors.ACCENT}; font-size: 9px; '
+            f'color: {Colors.ACCENT}; font-size: {Fonts.SIZE_MICRO}px; '
             f'font-family: {Fonts.DISPLAY}; background: transparent;')
         bot_lay.addWidget(self.info_lbl)
         bot_lay.addStretch()
@@ -2209,7 +2209,7 @@ class CropDialog(QDialog):
         # short-form / mobile (9:16) destinations.
         ratio_btn_qss = (
             f'QPushButton {{ background: transparent; border: 1px solid {Colors.TEXT}; '
-            f'color: {Colors.TEXT}; font-size: 9px; font-weight: bold; '
+            f'color: {Colors.TEXT}; font-size: {Fonts.SIZE_MICRO}px; font-weight: bold; '
             f'font-family: {Fonts.DISPLAY}; letter-spacing: 1px; }}'
             f'QPushButton:hover {{ border-color: {Colors.ACCENT}; color: {Colors.ACCENT}; }}'
         )
@@ -2232,7 +2232,7 @@ class CropDialog(QDialog):
         clear_btn.setFixedSize(80, 30)
         clear_btn.setStyleSheet(
             f'QPushButton {{ background: transparent; border: 1px solid {Colors.TEXT}; color: {Colors.TEXT};'
-            f' font-size: 9px; font-weight: bold; font-family: {Fonts.DISPLAY}; letter-spacing: 1px; }}'
+            f' font-size: {Fonts.SIZE_MICRO}px; font-weight: bold; font-family: {Fonts.DISPLAY}; letter-spacing: 1px; }}'
             f'QPushButton:hover {{ border-color: {Colors.ACCENT}; color: {Colors.ACCENT}; }}')
         clear_btn.clicked.connect(self._clear_crop)
         bot_lay.addWidget(clear_btn)
@@ -2241,7 +2241,7 @@ class CropDialog(QDialog):
         apply_btn.setFixedSize(110, 30)
         apply_btn.setStyleSheet(
             f'QPushButton {{ background: {Colors.ACCENT}; border: none; color: {Colors.BG};'
-            f' font-size: 9px; font-weight: bold; font-family: {Fonts.DISPLAY}; letter-spacing: 1px; }}'
+            f' font-size: {Fonts.SIZE_MICRO}px; font-weight: bold; font-family: {Fonts.DISPLAY}; letter-spacing: 1px; }}'
             f'QPushButton:hover {{ background: {Colors.TEXT}; }}')
         apply_btn.clicked.connect(self._apply)
         bot_lay.addWidget(apply_btn)
@@ -2418,7 +2418,7 @@ class ShareModeDialog(QDialog):
         x_btn.setFixedSize(22, 22)
         x_btn.setStyleSheet(
             f'QPushButton {{ background: transparent; border: none; '
-            f'color: {Colors.TEXT_MUTED}; font-size: 11px; }}'
+            f'color: {Colors.TEXT_MUTED}; font-size: {Fonts.SIZE_BODY}px; }}'
             f'QPushButton:hover {{ color: {Colors.ERROR}; }}'
         )
         x_btn.clicked.connect(self.close)
@@ -2430,7 +2430,7 @@ class ShareModeDialog(QDialog):
         fq_btn.setFixedHeight(40)
         fq_btn.setStyleSheet(
             f'QPushButton {{ background-color: {Colors.TEXT}; border: none; '
-            f'border-radius: 0px; color: {Colors.BG}; font-size: 10px; '
+            f'border-radius: 0px; color: {Colors.BG}; font-size: {Fonts.SIZE_LABEL}px; '
             f'font-weight: bold; font-family: {Fonts.DISPLAY}; '
             'letter-spacing: 1px; }'
             f'QPushButton:hover {{ background-color: {Colors.ACCENT}; }}'
@@ -2444,7 +2444,7 @@ class ShareModeDialog(QDialog):
         dc_btn.setStyleSheet(
             f'QPushButton {{ background-color: transparent; border: 1px solid '
             f'{Colors.BORDER}; border-radius: 0px; color: {Colors.TEXT_DIM}; '
-            f'font-size: 10px; font-weight: bold; font-family: {Fonts.DISPLAY}; '
+            f'font-size: {Fonts.SIZE_LABEL}px; font-weight: bold; font-family: {Fonts.DISPLAY}; '
             'letter-spacing: 1px; }'
             f'QPushButton:hover {{ border-color: {Colors.TEXT}; '
             f'color: {Colors.TEXT}; }}'
@@ -2668,7 +2668,7 @@ class ShareWindow(QDialog):
         close_btn.setFixedSize(30, 30)
         close_btn.setStyleSheet(
             f'QPushButton {{ background: transparent; border: none;'
-            f' color: {Colors.TEXT_MUTED}; font-size: 11px; }}'
+            f' color: {Colors.TEXT_MUTED}; font-size: {Fonts.SIZE_BODY}px; }}'
             f'QPushButton:hover {{ color: {Colors.ERROR}; }}')
         close_btn.clicked.connect(self.close)
         hdr_lay.addWidget(close_btn)
@@ -2726,7 +2726,7 @@ class ShareWindow(QDialog):
         self._popup_lbl.setStyleSheet(
             f'background-color: {_theme_rgba(Colors.BG, 170)}; '
             f'color: {Colors.TEXT}; '
-            f'font-size: 9px; font-weight: bold; font-family: {Fonts.DISPLAY}; '
+            f'font-size: {Fonts.SIZE_MICRO}px; font-weight: bold; font-family: {Fonts.DISPLAY}; '
             'letter-spacing: 1px; padding: 4px 10px;')
         self._popup_lbl.adjustSize()
         _ph = self._popup_lbl.height()
@@ -3179,7 +3179,7 @@ class VolumePopup(QDialog):
                 }[icon_key])
                 icon.setToolTip(f'{icon_key.title()} audio source')
                 icon.setStyleSheet(
-                    f'color: {Colors.ACCENT}; font-size: 11px; '
+                    f'color: {Colors.ACCENT}; font-size: {Fonts.SIZE_BODY}px; '
                     'background: transparent;')
             self._icons[key] = icon
             row.addWidget(icon)
@@ -3227,7 +3227,7 @@ class VolumePopup(QDialog):
             value_lbl.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             value_lbl.setStyleSheet(
-                f'color: {Colors.ACCENT if source is None or source.available else Colors.TEXT_DIM}; font-size: 9px; '
+                f'color: {Colors.ACCENT if source is None or source.available else Colors.TEXT_DIM}; font-size: {Fonts.SIZE_MICRO}px; '
                 f'font-family: {Fonts.DISPLAY}; background: transparent;')
             if source is not None and not source.available:
                 value_lbl.setText('—')
@@ -4885,13 +4885,13 @@ class ClipViewer(QDialog):
             }}
             QPushButton#editorMin {{
                 background: transparent; border: none; color: {Colors.TEXT_DIM};
-                font-size: 14px; font-weight: bold;
+                font-size: {Fonts.SIZE_BUTTON}px; font-weight: bold;
             }}
             QPushButton#editorMin:hover {{
                 background-color: {Colors.SURFACE_3}; color: {Colors.TEXT};
             }}
             QPushButton#editorClose {{
-                background: transparent; border: none; color: {Colors.TEXT_DIM}; font-size: 13px;
+                background: transparent; border: none; color: {Colors.TEXT_DIM}; font-size: {Fonts.SIZE_BODY_L}px;
             }}
             QPushButton#editorClose:hover {{ background-color: {Colors.ERROR}; color: {Colors.TEXT}; }}
 
@@ -4974,7 +4974,7 @@ class ClipViewer(QDialog):
             QPushButton#timelineTool {{
                 min-width: 24px; max-width: 24px; min-height: 24px; max-height: 24px;
                 background-color: {Colors.SURFACE_2}; border: 1px solid {Colors.BORDER};
-                border-radius: 0px; color: {Colors.TEXT_DIM}; font-size: 13px;
+                border-radius: 0px; color: {Colors.TEXT_DIM}; font-size: {Fonts.SIZE_BODY_L}px;
                 font-family: {Fonts.BODY}; padding: 0;
             }}
             QPushButton#timelineTool:hover {{ border-color: {Colors.ACCENT}; color: {Colors.ACCENT}; }}

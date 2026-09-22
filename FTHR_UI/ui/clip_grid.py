@@ -904,7 +904,7 @@ class ClipThumbnail(QFrame):
                 background: transparent;
                 border: none;
                 color: {Colors.TEXT_DIM};
-                font-size: 16px;
+                font-size: {Fonts.SIZE_H3}px;
                 font-weight: bold;
             }}
             QPushButton#cardIconBtn:hover {{
@@ -1679,7 +1679,7 @@ class ClipGrid(QWidget):
                 border: 1px solid {Colors.BORDER};
                 border-radius: {Sizes.RADIUS_MD}px;
                 color: {Colors.TEXT_DIM};
-                font-size: 14px;
+                font-size: {Fonts.SIZE_BUTTON}px;
             }}
             QPushButton#viewToggle:hover, QPushButton#viewToggleActive:hover {{
                 color: {Colors.ACCENT};
